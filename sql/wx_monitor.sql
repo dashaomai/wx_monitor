@@ -1,8 +1,10 @@
+CREATE DATABASE  IF NOT EXISTS `wx_monitor` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+USE `wx_monitor`;
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
--- Host: localhost    Database: wx_monitor
+-- Host: 192.168.9.77    Database: wx_monitor
 -- ------------------------------------------------------
--- Server version	5.5.5-10.2.10-MariaDB
+-- Server version	5.5.5-10.1.26-MariaDB-0+deb9u1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -30,14 +32,18 @@ CREATE TABLE `chatrooms` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `chatrooms`
+-- Temporary view structure for view `formated_text_messages`
 --
 
-LOCK TABLES `chatrooms` WRITE;
-/*!40000 ALTER TABLE `chatrooms` DISABLE KEYS */;
-INSERT INTO `chatrooms` VALUES (1,'鼓浪读书会');
-/*!40000 ALTER TABLE `chatrooms` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `formated_text_messages`;
+/*!50001 DROP VIEW IF EXISTS `formated_text_messages`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE VIEW `formated_text_messages` AS SELECT 
+ 1 AS `time`,
+ 1 AS `nickname`,
+ 1 AS `content`*/;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `recording_messages`
@@ -55,15 +61,6 @@ CREATE TABLE `recording_messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `recording_messages`
---
-
-LOCK TABLES `recording_messages` WRITE;
-/*!40000 ALTER TABLE `recording_messages` DISABLE KEYS */;
-/*!40000 ALTER TABLE `recording_messages` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `text_messages`
 --
 
@@ -79,13 +76,20 @@ CREATE TABLE `text_messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `text_messages`
+-- Final view structure for view `formated_text_messages`
 --
 
-LOCK TABLES `text_messages` WRITE;
-/*!40000 ALTER TABLE `text_messages` DISABLE KEYS */;
-/*!40000 ALTER TABLE `text_messages` ENABLE KEYS */;
-UNLOCK TABLES;
+/*!50001 DROP VIEW IF EXISTS `formated_text_messages`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED DEFINER=`` SQL SECURITY DEFINER VIEW `formated_text_messages` AS select from_unixtime(`text_messages`.`create_time`) AS `time`,`text_messages`.`nickname` AS `nickname`,`text_messages`.`content` AS `content` from `text_messages` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -96,4 +100,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-12-12 11:12:34
+-- Dump completed on 2017-12-20 16:06:00
