@@ -58,10 +58,9 @@ CREATE TABLE `formated_text_messages` (
 -- Dumping structure for table wx_monitor.persons
 CREATE TABLE IF NOT EXISTS `persons` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(100) NOT NULL COMMENT '微信联系人编号',
   `nickname` varchar(100) NOT NULL COMMENT '微信联系人昵称',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQUE USERNAME` (`username`)
+  UNIQUE KEY `UNIQUE USERNAME` (`nickname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='个人信息记录';
 
 -- Dumping data for table wx_monitor.persons: ~0 rows (approximately)
@@ -72,8 +71,9 @@ DELETE FROM `persons`;
 -- Dumping structure for table wx_monitor.recording_messages
 CREATE TABLE IF NOT EXISTS `recording_messages` (
   `create_time` int(11) NOT NULL,
-  `nickname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `filename` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `chatroom_id` bigint(20) unsigned NOT NULL COMMENT '所属聊天群的 id',
+  `person_id` bigint(20) unsigned NOT NULL COMMENT '所属联系人的 id',
+  `filename` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文件名',
   PRIMARY KEY (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
