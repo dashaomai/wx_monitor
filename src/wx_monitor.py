@@ -4,7 +4,19 @@
 import itchat
 from itchat.content import *
 from db import *
-import platform
+import platform, os
+
+
+def get_nickname(msg):
+	# username = msg['ActualUserName']
+	nickname = msg['ActualNickName']
+
+	if '' == nickname:
+		# 群主发言，没有 ActualNickName
+		slf = msg['User']['Self']
+		nickname = slf['NickName']
+
+	return nickname
 
 
 def monitor(group_id, group_name):
@@ -16,13 +28,7 @@ def monitor(group_id, group_name):
 			group_name2 = msg['User']['NickName']
 			if group_name2 == group_name:
 				# print('符合')
-				slf = msg['User']['Self']
-				# username = msg['ActualUserName']
-				nickname = msg['ActualNickName']
-
-				if '' == nickname:
-					# 群主发言，没有 ActualNickName
-					nickname = slf['NickName']
+				nickname = get_nickname(msg)
 
 				content = msg['Content']
 				create_time = msg['CreateTime']
@@ -36,12 +42,14 @@ def monitor(group_id, group_name):
 		# 保存语音消息
 		@itchat.msg_register([RECORDING], isGroupChat=True)
 		def download_files(msg):
+			if not os.path.exists('records'):
+				os.makedirs('records')
 			msg.download('records/' + msg.fileName)
 
-			nickname = msg['ActualNickName']
+			nickname = get_nickname(msg)
 			filename = msg.fileName
 			create_time = msg['CreateTime']
-			insert_recording_message(nickname, filename, create_time)
+			insert_recording_message(group_id, nickname, filename, create_time)
 
 			print('文件 ' + msg.fileName + ' 已下载')
 

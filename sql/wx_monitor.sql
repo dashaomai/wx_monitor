@@ -47,10 +47,20 @@ INSERT INTO `chatrooms` (`id`, `account_id`, `title`) VALUES
 	(2, 1, '两弹一星');
 /*!40000 ALTER TABLE `chatrooms` ENABLE KEYS */;
 
+-- Dumping structure for view wx_monitor.formated_recording_messages
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `formated_recording_messages` (
+	`time` DATETIME NULL,
+	`group_name` VARCHAR(100) NOT NULL COMMENT '聊天群的名称' COLLATE 'utf8mb4_unicode_ci',
+	`nickname` VARCHAR(100) NOT NULL COMMENT '微信联系人昵称' COLLATE 'utf8mb4_general_ci',
+	`filename` VARCHAR(50) NOT NULL COMMENT '文件名' COLLATE 'utf8mb4_unicode_ci'
+) ENGINE=MyISAM;
+
 -- Dumping structure for view wx_monitor.formated_text_messages
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `formated_text_messages` (
 	`time` DATETIME NULL,
+	`group_name` VARCHAR(100) NOT NULL COMMENT '聊天群的名称' COLLATE 'utf8mb4_unicode_ci',
 	`nickname` VARCHAR(100) NOT NULL COMMENT '微信联系人昵称' COLLATE 'utf8mb4_general_ci',
 	`content` TEXT NOT NULL COMMENT '发言内容' COLLATE 'utf8mb4_unicode_ci'
 ) ENGINE=MyISAM;
@@ -96,10 +106,15 @@ DELETE FROM `text_messages`;
 /*!40000 ALTER TABLE `text_messages` DISABLE KEYS */;
 /*!40000 ALTER TABLE `text_messages` ENABLE KEYS */;
 
+-- Dumping structure for view wx_monitor.formated_recording_messages
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `formated_recording_messages`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `formated_recording_messages` AS select from_unixtime(`rm`.`create_time`) AS `time`,`cr`.`title` AS `group_name`,`p`.`nickname` AS `nickname`,`rm`.`filename` AS `filename` from ((`recording_messages` `rm` join `persons` `p` on((`rm`.`person_id` = `p`.`id`))) join `chatrooms` `cr` on((`rm`.`chatroom_id` = `cr`.`id`)));
+
 -- Dumping structure for view wx_monitor.formated_text_messages
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `formated_text_messages`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `formated_text_messages` AS select from_unixtime(`tm`.`create_time`) AS `time`,`p`.`nickname` AS `nickname`,`tm`.`content` AS `content` from (`text_messages` `tm` join `persons` `p` on((`tm`.`person_id` = `p`.`id`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `formated_text_messages` AS select from_unixtime(`tm`.`create_time`) AS `time`,`cr`.`title` AS `group_name`,`p`.`nickname` AS `nickname`,`tm`.`content` AS `content` from ((`text_messages` `tm` join `persons` `p` on((`tm`.`person_id` = `p`.`id`))) join `chatrooms` `cr` on((`tm`.`chatroom_id` = `cr`.`id`)));
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

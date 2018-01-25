@@ -54,13 +54,18 @@ def _insert_text_message(conn, cursor, chatroom_id, nickname, content, create_ti
 
 # 插入一条聊天内容
 def insert_text_message(chatroom_id, nickname, content, create_time):
-	return _db_template(_insert_text_message, chatroom_id=chatroom_id, nickname=nickname, content=content, create_time=create_time)
+	return _db_template(
+		_insert_text_message,
+		chatroom_id=chatroom_id, nickname=nickname, content=content, create_time=create_time)
 
 
-def _insert_recording_message(conn, cursor, nickname, filename, create_time):
+def _insert_recording_message(conn, cursor, chatroom_id, nickname, filename, create_time):
+	# 先根据 username 和 nickname 取得对应 Person 的 id
+	person_id = _get_person_id(conn, cursor, nickname)
+
 	cursor.execute(
-		'INSERT INTO recording_messages (create_time, nickname, filename) VALUES(%s, %s, %s);',
-		(create_time, nickname, filename)
+		'INSERT INTO recording_messages (create_time, chatroom_id, person_id, filename) VALUES(%s, %s, %s, %s);',
+		(create_time, chatroom_id, person_id, filename)
 	)
 
 	if cursor.rowcount > 0:
@@ -70,8 +75,8 @@ def _insert_recording_message(conn, cursor, nickname, filename, create_time):
 
 
 # 插入一条语音记录
-def insert_recording_message(nickname, filename, create_time):
-	return _db_template(_insert_recording_message, nickname=nickname, filename=filename, create_time=create_time)
+def insert_recording_message(chatroom_id, nickname, filename, create_time):
+	return _db_template(_insert_recording_message, chatroom_id=chatroom_id, nickname=nickname, filename=filename, create_time=create_time)
 
 
 def _get_person_id(conn, cursor, nickname):
