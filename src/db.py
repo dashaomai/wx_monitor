@@ -50,7 +50,7 @@ def _insert_text_message(conn, cursor, nickname, content, create_time):
 
 # 插入一条聊天内容
 def insert_text_message(nickname, content, create_time):
-	return _db_template(_insert_text_message, nickname=nickname, content=content, createTime=create_time)
+	return _db_template(_insert_text_message, nickname=nickname, content=content, create_time=create_time)
 
 
 def _insert_recording_message(conn, cursor, nickname, filename, create_time):
@@ -66,7 +66,7 @@ def _insert_recording_message(conn, cursor, nickname, filename, create_time):
 
 # 插入一条语音记录
 def insert_recording_message(nickname, filename, create_time):
-	return _db_template(_insert_recording_message, nickname=nickname, filename=filename, createTime=create_time)
+	return _db_template(_insert_recording_message, nickname=nickname, filename=filename, create_time=create_time)
 
 
 def _db_template(callback, **other):
