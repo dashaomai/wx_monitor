@@ -10,7 +10,7 @@ def select_id_by_account(account_name):
 
 
 def _select_id_by_account(_, cursor, account_name):
-	cursor.execute('SELECT id FROM accounts WHERE name=%s LIMIT 1', [account_name])
+	cursor.execute('SELECT id FROM accounts WHERE name=%s LIMIT 1', account_name)
 	values = cursor.fetchall()
 
 	if len(values) > 0:
@@ -20,7 +20,7 @@ def _select_id_by_account(_, cursor, account_name):
 
 
 def _select_chatrooms(_, cursor, account_id):
-	cursor.execute('SELECT id, title FROM chatrooms WHERE account_id=%s;', [account_id])
+	cursor.execute('SELECT id, title FROM chatrooms WHERE account_id=%s;', account_id)
 	values = cursor.fetchall()
 
 	# return [x[0] for x in values]
@@ -37,13 +37,13 @@ def select_chatrooms(account_name):
 		return _db_template(_select_chatrooms, account_id=account_id)
 
 
-def _insert_text_message(conn, cursor, username, nickname, content, create_time):
+def _insert_text_message(conn, cursor, chatroom_id, username, nickname, content, create_time):
 	# 先根据 username 和 nickname 取得对应 Person 的 id
 	person_id = _get_person_id(conn, cursor, username, nickname)
 
 	cursor.execute(
-		'INSERT INTO text_messages (create_time, person_id, content) VALUES (%s, %s, %s);',
-		[create_time, person_id, content]
+		'INSERT INTO text_messages (create_time, chatroom_id, person_id, content) VALUES (%s, %s, %s, %s);',
+		(create_time, chatroom_id, person_id, content)
 	)
 
 	if cursor.rowcount > 0:
@@ -53,14 +53,14 @@ def _insert_text_message(conn, cursor, username, nickname, content, create_time)
 
 
 # 插入一条聊天内容
-def insert_text_message(username, nickname, content, create_time):
-	return _db_template(_insert_text_message, username=username, nickname=nickname, content=content, create_time=create_time)
+def insert_text_message(chatroom_id, username, nickname, content, create_time):
+	return _db_template(_insert_text_message, chatroom_id=chatroom_id, username=username, nickname=nickname, content=content, create_time=create_time)
 
 
 def _insert_recording_message(conn, cursor, nickname, filename, create_time):
 	cursor.execute(
 		'INSERT INTO recording_messages (create_time, nickname, filename) VALUES(%s, %s, %s);',
-		[create_time, nickname, filename]
+		(create_time, nickname, filename)
 	)
 
 	if cursor.rowcount > 0:
@@ -77,7 +77,7 @@ def insert_recording_message(nickname, filename, create_time):
 def _get_person_id(conn, cursor, username, nickname):
 	cursor.execute(
 		'SELECT id FROM persons WHERE username=%s LIMIT 1;',
-		[username]
+		username
 	)
 
 	results = cursor.fetchall()
@@ -89,7 +89,7 @@ def _get_person_id(conn, cursor, username, nickname):
 		# 更新昵称
 		cursor.execute(
 			'UPDATE persons SET nickname=%s WHERE id=%s AND nickname!=%s',
-			[nickname, person_id, nickname]
+			(nickname, person_id, nickname)
 		)
 
 		if cursor.rowcount > 0:
@@ -101,7 +101,7 @@ def _get_person_id(conn, cursor, username, nickname):
 		# 该人不存在
 		cursor.execute(
 			'INSERT INTO persons (username, nickname) VALUES(%s, %s);',
-			[username, nickname]
+			(username, nickname)
 		)
 
 		# 找到 person_id

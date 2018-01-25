@@ -85,6 +85,7 @@ DELETE FROM `recording_messages`;
 -- Dumping structure for table wx_monitor.text_messages
 CREATE TABLE IF NOT EXISTS `text_messages` (
   `create_time` int(11) NOT NULL COMMENT '创建时间',
+  `chatroom_id` bigint(20) unsigned NOT NULL,
   `person_id` bigint(20) unsigned NOT NULL COMMENT '发言者 id',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '发言内容',
   PRIMARY KEY (`create_time`)

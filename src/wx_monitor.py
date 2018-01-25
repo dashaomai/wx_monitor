@@ -10,10 +10,6 @@ import platform
 def monitor(group_id, group_name):
 	groups = itchat.search_chatrooms(name=group_name)
 	if len(groups) > 0:
-		group = groups[0]
-		# print(group)
-		group_user_name = group['UserName']
-
 		# 保存文字消息
 		@itchat.msg_register([TEXT], isGroupChat=True)
 		def print_messages(msg):
@@ -30,7 +26,7 @@ def monitor(group_id, group_name):
 
 				content = msg['Content']
 				create_time = msg['CreateTime']
-				insert_text_message(username, nickname, content, create_time)
+				insert_text_message(group_id, username, nickname, content, create_time)
 
 				print('消息 ' + content + '已保存')
 
