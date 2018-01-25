@@ -20,10 +20,18 @@ def monitor(group_id, group_name):
 			group_name2 = msg['User']['NickName']
 			if group_name2 == group_name:
 				# print('符合')
+				print(msg)
+				slf = msg['User']['Self']
+				username = msg['ActualUserName']
 				nickname = msg['ActualNickName']
+
+				if '' == nickname:
+					# 群主发言，没有 ActualNickName
+					nickname = slf['NickName']
+
 				content = msg['Content']
 				create_time = msg['CreateTime']
-				insert_text_message(nickname, content, create_time)
+				insert_text_message(username, nickname, content, create_time)
 
 				print('消息 ' + content + '已保存')
 
