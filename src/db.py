@@ -39,13 +39,15 @@ def select_chatrooms(account_name):
 
 def _insert_text_message(conn, cursor, username, nickname, content, create_time):
 	# 先根据 username 和 nickname 取得对应 Person 的 id
+	person_id = _get_person_id(conn, cursor, username, nickname)
 
 	cursor.execute(
-		'INSERT INTO text_messages (create_time, nickname, content) VALUES (%s, %s, %s);',
-		[create_time, nickname, content]
+		'INSERT INTO text_messages (create_time, person_id, content) VALUES (%s, %s, %s);',
+		[create_time, person_id, content]
 	)
 
-	conn.commit()
+	if cursor.rowcount > 0:
+		conn.commit()
 
 	return 1 == cursor.rowcount
 
@@ -61,7 +63,8 @@ def _insert_recording_message(conn, cursor, nickname, filename, create_time):
 		[create_time, nickname, filename]
 	)
 
-	conn.commit()
+	if cursor.rowcount > 0:
+		conn.commit()
 
 	return 1 == cursor.rowcount
 
@@ -89,10 +92,7 @@ def _get_person_id(conn, cursor, username, nickname):
 			[nickname, person_id, nickname]
 		)
 
-		effected = cursor.fetchall()
-		print(effected)
-
-		if conn.afffected_rows() > 0:
+		if cursor.rowcount > 0:
 			conn.commit()
 		else:
 			print("未能更新 persons：%d, %s, %s" % (person_id, username, nickname))
@@ -100,12 +100,12 @@ def _get_person_id(conn, cursor, username, nickname):
 	else:
 		# 该人不存在
 		cursor.execute(
-			'INSERT INTO persons SET username=%s, nickname=%s;',
+			'INSERT INTO persons (username, nickname) VALUES(%s, %s);',
 			[username, nickname]
 		)
 
 		# 找到 person_id
-		person_id = conn.insert_id()
+		person_id = cursor.lastrowid
 
 	# 返回 person_id
 	return person_id

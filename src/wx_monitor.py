@@ -20,7 +20,6 @@ def monitor(group_id, group_name):
 			group_name2 = msg['User']['NickName']
 			if group_name2 == group_name:
 				# print('符合')
-				print(msg)
 				slf = msg['User']['Self']
 				username = msg['ActualUserName']
 				nickname = msg['ActualNickName']
