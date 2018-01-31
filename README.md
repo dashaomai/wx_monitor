@@ -7,9 +7,11 @@
 程序基于 python 3.6.x 开发，需要安装以下插件：
 1. pip3 install itchat
 1. pip3 install mysql-connector-python --allow-external mysql-connector-python
+1. pip3 install snownlp
 
 如果 mysql-connector-python 安装失败，可以试试另外一个替代驱动：
 pip3 install mysql-connector
 
 ### 执行
 将需要监控的群名称保存于数据库：wx_monitor/chatrooms 表内，运行 src/wx_monitor.py，扫码登录微信即可
+需要监控某个账号下的全部微信群时，运行 src/sentiment_analyse.py <账号名>，就能将当天内关联在该账号下的全部聊天群的聊天内容做舆情扫描和分析，并将结果保存进数据库当中。
