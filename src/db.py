@@ -159,15 +159,15 @@ def _select_text_messages(_, cursor, chatroom_id, begin, end):
 
 
 # 保存一条聊天组某天的统计结果
-def save_chatroom_analyse(chatroom_id, date, member_active, talk_count, sentence_count, sentiment_mean):
+def save_chatroom_analyse(chatroom_id, begin, end, member_active, talk_count, sentence_count, sentiment_mean):
     return _db_template(
         _save_chatroom_analyse,
-        chatroom_id=chatroom_id, date=date, member_active=member_active, talk_count=talk_count,
+        chatroom_id=chatroom_id, begin=begin, end=end, member_active=member_active, talk_count=talk_count,
         sentence_count=sentence_count, sentiment_mean=sentiment_mean
     )
 
 
-def _save_chatroom_analyse(conn, cursor, chatroom_id, date, member_active, talk_count, sentence_count, sentiment_mean):
+def _save_chatroom_analyse(conn, cursor, chatroom_id, begin, end, member_active, talk_count, sentence_count, sentiment_mean):
     # 先取出组内当前成员数量
     cursor.execute(
         'SELECT member_count FROM chatrooms WHERE id=%s LIMIT 1;',
@@ -180,13 +180,12 @@ def _save_chatroom_analyse(conn, cursor, chatroom_id, date, member_active, talk_
         member_count = row[0]
 
         print(
-            '聊天组 #{} 在 {} 时统计结果：member_count = {}, member_active = {}, talk_count = {}, sentence_count = {}, sentiment_mean = {}'.format(chatroom_id, date, member_count, member_active, talk_count, sentence_count, sentiment_mean)
+            '聊天组 #{} 在 {} 时统计结果：member_count = {}, member_active = {}, talk_count = {}, sentence_count = {}, sentiment_mean = {}'.format(chatroom_id, begin, member_count, member_active, talk_count, sentence_count, sentiment_mean)
         )
 
         # 现在开始保存动作
         cursor.execute(
-            'REPLACE INTO chatroom_analyse(chatroom_id, `date`, member_count, member_active, talk_count, sentence_count, sentiment_mean) VALUES(%s, %s, %s, %s, %s, %s, %s)',
-            [chatroom_id, date, member_count, member_active, talk_count, sentence_count, sentiment_mean]
+            'REPLACE INTO chatroom_analyse(chatroom_id, `begin`, `end`, member_count, member_active, talk_count, sentence_count, sentiment_mean) VALUES({}, {}, {}, {}, {}, {}, {}, {})'.format(chatroom_id, begin, end, member_count, member_active, talk_count, sentence_count, sentiment_mean)
         )
 
         conn.commit()

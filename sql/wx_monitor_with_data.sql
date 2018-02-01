@@ -51,20 +51,21 @@ INSERT INTO `chatrooms` (`id`, `account_id`, `member_count`, `title`) VALUES
 -- Dumping structure for table wx_monitor.chatroom_analyse
 CREATE TABLE IF NOT EXISTS `chatroom_analyse` (
   `chatroom_id` bigint(20) unsigned NOT NULL COMMENT 'chatrooms.id',
-  `date` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '该条分析对应的那天 0 点的时间戳',
+  `begin` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '该条分析对应的开始时间戳',
+  `end` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '该条分析对应的结束时间戳',
   `member_count` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT '当天成员总数',
   `member_active` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT '当天活跃成员总数（发言过）',
   `talk_count` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '交谈次数',
   `sentence_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '句子总数',
   `sentiment_mean` float NOT NULL DEFAULT '0' COMMENT '根据发言判定的舆情正负倾向综合数值',
-  PRIMARY KEY (`chatroom_id`,`date`)
+  PRIMARY KEY (`chatroom_id`,`begin`,`end`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='指定聊天组的舆情分析结果';
 
--- Dumping data for table wx_monitor.chatroom_analyse: ~0 rows (approximately)
+-- Dumping data for table wx_monitor.chatroom_analyse: ~2 rows (approximately)
 DELETE FROM `chatroom_analyse`;
 /*!40000 ALTER TABLE `chatroom_analyse` DISABLE KEYS */;
-INSERT INTO `chatroom_analyse` (`chatroom_id`, `date`, `member_count`, `member_active`, `talk_count`, `sentence_count`, `sentiment_mean`) VALUES
-	(2, 1517328000, 2, 2, 2, 6, 0.439586);
+INSERT INTO `chatroom_analyse` (`chatroom_id`, `begin`, `end`, `member_count`, `member_active`, `talk_count`, `sentence_count`, `sentiment_mean`) VALUES
+	(2, 1517328000, 1603728000, 2, 2, 2, 6, 0.439586);
 /*!40000 ALTER TABLE `chatroom_analyse` ENABLE KEYS */;
 
 -- Dumping structure for view wx_monitor.formated_recording_messages
@@ -126,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `text_messages` (
   PRIMARY KEY (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table wx_monitor.text_messages: ~6 rows (approximately)
+-- Dumping data for table wx_monitor.text_messages: ~7 rows (approximately)
 DELETE FROM `text_messages`;
 /*!40000 ALTER TABLE `text_messages` DISABLE KEYS */;
 INSERT INTO `text_messages` (`create_time`, `chatroom_id`, `person_id`, `content`) VALUES

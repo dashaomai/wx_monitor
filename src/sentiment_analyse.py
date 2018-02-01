@@ -68,7 +68,7 @@ def main():
                 member_active = len(grouped_person_id)
 
                 # 将该条结果保存入数据库中
-                save_chatroom_analyse(group_id, begin, member_active, talk_count, sentiment_count, sentiment_mean)
+                save_chatroom_analyse(group_id, begin, end, member_active, talk_count, sentiment_count, sentiment_mean)
 
             else:
                 print('聊天组 #%s 没有聊天记录供舆情分析' % group_name)
