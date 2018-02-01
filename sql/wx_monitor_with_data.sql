@@ -2,7 +2,7 @@
 -- Host:                         127.0.0.1
 -- Server version:               5.7.19 - MySQL Community Server (GPL)
 -- Server OS:                    Linux
--- HeidiSQL Version:             9.5.0.5196
+-- HeidiSQL Version:             9.5.0.5227
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -63,24 +63,23 @@ CREATE TABLE IF NOT EXISTS `chatroom_analyse` (
   PRIMARY KEY (`chatroom_id`,`begin`,`end`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='指定聊天组的舆情分析结果';
 
--- Dumping data for table wx_monitor.chatroom_analyse: ~2 rows (approximately)
+-- Dumping data for table wx_monitor.chatroom_analyse: ~1 rows (approximately)
 DELETE FROM `chatroom_analyse`;
 /*!40000 ALTER TABLE `chatroom_analyse` DISABLE KEYS */;
 INSERT INTO `chatroom_analyse` (`chatroom_id`, `begin`, `end`, `member_count`, `member_active`, `talk_count`, `sentence_count`, `sentiment_mean`) VALUES
-	(2, 1517328000, 1603728000, 2, 2, 2, 6, 0.439586),
-	(2, 1517414400, 1603814400, 2, 1, 7, 9, 0.348152);
+	(2, 1517414400, 1517500800, 2, 2, 8, 12, 0.370425);
 /*!40000 ALTER TABLE `chatroom_analyse` ENABLE KEYS */;
 
 -- Dumping structure for view wx_monitor.formated_chatroom_analyse
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `formated_chatroom_analyse` (
-	`chatroom` VARCHAR(100) NULL COMMENT '聊天群的名称' COLLATE 'utf8mb4_unicode_ci',
-	`begin` DATETIME NULL,
-	`end` DATETIME NULL,
-	`member_active_rate` DECIMAL(9,4) UNSIGNED NULL,
-	`talk_count` MEDIUMINT(8) UNSIGNED NOT NULL COMMENT '交谈次数',
-	`sentence_count` INT(10) UNSIGNED NOT NULL COMMENT '句子总数',
-	`sentiment_mean` FLOAT NOT NULL COMMENT '根据发言判定的舆情正负倾向综合数值'
+	`微信群名` VARCHAR(100) NULL COMMENT '聊天群的名称' COLLATE 'utf8mb4_unicode_ci',
+	`开始时间` DATETIME NULL,
+	`结束时间` DATETIME NULL,
+	`活跃群成员比例` VARCHAR(13) NULL COLLATE 'utf8mb4_general_ci',
+	`发言总次数` MEDIUMINT(8) UNSIGNED NOT NULL COMMENT '交谈次数',
+	`语句总数` INT(10) UNSIGNED NOT NULL COMMENT '句子总数',
+	`舆情系数（0.0~1.0）` FLOAT NOT NULL COMMENT '根据发言判定的舆情正负倾向综合数值'
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view wx_monitor.formated_recording_messages
@@ -166,7 +165,7 @@ INSERT INTO `text_messages` (`create_time`, `chatroom_id`, `person_id`, `content
 -- Dumping structure for view wx_monitor.formated_chatroom_analyse
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `formated_chatroom_analyse`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `formated_chatroom_analyse` AS select `c`.`title` AS `chatroom`,from_unixtime(`ca`.`begin`) AS `begin`,from_unixtime(`ca`.`end`) AS `end`,(`ca`.`member_active` / `ca`.`member_count`) AS `member_active_rate`,`ca`.`talk_count` AS `talk_count`,`ca`.`sentence_count` AS `sentence_count`,`ca`.`sentiment_mean` AS `sentiment_mean` from (`chatroom_analyse` `ca` left join `chatrooms` `c` on((`ca`.`chatroom_id` = `c`.`id`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `formated_chatroom_analyse` AS select `c`.`title` AS `微信群名`,from_unixtime(`ca`.`begin`) AS `开始时间`,from_unixtime(`ca`.`end`) AS `结束时间`,concat(truncate(((`ca`.`member_active` / `ca`.`member_count`) * 100),2),'%') AS `活跃群成员比例`,`ca`.`talk_count` AS `发言总次数`,`ca`.`sentence_count` AS `语句总数`,`ca`.`sentiment_mean` AS `舆情系数（0.0~1.0）` from (`chatroom_analyse` `ca` left join `chatrooms` `c` on((`ca`.`chatroom_id` = `c`.`id`)));
 
 -- Dumping structure for view wx_monitor.formated_recording_messages
 -- Removing temporary table and create final VIEW structure
