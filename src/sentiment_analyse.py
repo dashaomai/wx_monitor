@@ -22,7 +22,7 @@ def main():
 
     # 获取要查询的时间范围
     yesterday = time.mktime(datetime.date.today().timetuple())
-    end = yesterday + 1000 * 60 * 60 * 24
+    end = yesterday + 60 * 60 * 24
 
     # 获取指定聊天室的 id 和已存在的分析过的时间戳
     db_groups = select_chatrooms(account_name)
