@@ -8,7 +8,8 @@ import sys
 
 from snownlp import SnowNLP
 
-from db import select_chatrooms, select_text_messages, save_chatroom_analyse
+from db import select_chatrooms, select_text_messages, save_chatroom_analyse, select_email
+from mail import send_alert_email
 
 
 def main():
@@ -26,6 +27,9 @@ def main():
     # 获取指定聊天室的 id 和已存在的分析过的时间戳
     db_groups = select_chatrooms(account_name)
     if len(db_groups) > 0:
+
+        # 选出舆情预警发送的电子邮件地址
+        email = select_email(account_name)
 
         # 遍历每一个对应的聊天组
         for group in db_groups:
@@ -69,6 +73,11 @@ def main():
 
                 # 将该条结果保存入数据库中
                 save_chatroom_analyse(group_id, begin, end, member_active, talk_count, sentiment_count, sentiment_mean)
+
+                # 如果舆情有问题，则发起主动预警
+                if sentiment_mean < 0.35 and None is not email:
+                    # 发送邮件预警
+                    send_alert_email(email, account_name, group_name, sentiment_mean)
 
             else:
                 print('聊天组 #%s 没有聊天记录供舆情分析' % group_name)

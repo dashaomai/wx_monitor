@@ -36,6 +36,24 @@ def select_chatrooms(account_name):
         return _db_template(_select_chatrooms, account_id=account_id)
 
 
+# 选出对应账号的邮箱地址
+def select_email(account_name):
+    return _db_template(_select_email, account_name=account_name)
+
+
+def _select_email(_, cursor, account_name):
+    cursor.execute(
+        'SELECT email FROM accounts WHERE `name`=%s LIMIT 1;',
+        [account_name]
+    )
+
+    row = cursor.fetchone()
+
+    if row is not None:
+        return row[0]
+    else:
+        return None
+
 def _insert_text_message(conn, cursor, chatroom_id, member_count, nickname, content, create_time):
     # 先根据 username 和 nickname 取得对应 Person 的 id
     person_id = _get_person_id(conn, cursor, nickname)
