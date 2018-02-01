@@ -20,15 +20,17 @@ USE `wx_monitor`;
 CREATE TABLE IF NOT EXISTS `accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '监控账号的 id，负数 id 表示特殊保留账号',
   `name` varchar(50) NOT NULL COMMENT '监控账号的名称',
+  `email` varchar(50) NOT NULL COMMENT '监控账号接收舆情预警的电子邮件地址',
   `description` text COMMENT '监控账号的描述',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE NAME` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='监控账号列表';
 
--- Dumping data for table wx_monitor.accounts: ~0 rows (approximately)
+-- Dumping data for table wx_monitor.accounts: ~1 rows (approximately)
 DELETE FROM `accounts`;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` (`id`, `name`, `description`) VALUES
-	(1, '特房集团天津鼓浪水镇开发分公司', '厦门特房集团在天津滨海新区，以鼓浪屿为背景，搬移到此的相关内容');
+INSERT INTO `accounts` (`id`, `name`, `email`, `description`) VALUES
+	(1, '特房集团天津鼓浪水镇开发分公司', 'dashaomai@qq.com', '厦门特房集团在天津滨海新区，以鼓浪屿为背景，搬移到此的相关内容');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 
 -- Dumping structure for table wx_monitor.chatrooms
@@ -61,11 +63,12 @@ CREATE TABLE IF NOT EXISTS `chatroom_analyse` (
   PRIMARY KEY (`chatroom_id`,`begin`,`end`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='指定聊天组的舆情分析结果';
 
--- Dumping data for table wx_monitor.chatroom_analyse: ~2 rows (approximately)
+-- Dumping data for table wx_monitor.chatroom_analyse: ~1 rows (approximately)
 DELETE FROM `chatroom_analyse`;
 /*!40000 ALTER TABLE `chatroom_analyse` DISABLE KEYS */;
 INSERT INTO `chatroom_analyse` (`chatroom_id`, `begin`, `end`, `member_count`, `member_active`, `talk_count`, `sentence_count`, `sentiment_mean`) VALUES
-	(2, 1517328000, 1603728000, 2, 2, 2, 6, 0.439586);
+	(2, 1517328000, 1603728000, 2, 2, 2, 6, 0.439586),
+	(2, 1517414400, 1603814400, 2, 1, 7, 9, 0.348152);
 /*!40000 ALTER TABLE `chatroom_analyse` ENABLE KEYS */;
 
 -- Dumping structure for view wx_monitor.formated_recording_messages
@@ -137,7 +140,14 @@ INSERT INTO `text_messages` (`create_time`, `chatroom_id`, `person_id`, `content
 	(1517301177, 2, 2, '抢票啊！'),
 	(1517301310, 2, 2, '烦死了，一张票没有'),
 	(1517365135, 2, 2, '可怜的娃'),
-	(1517365973, 2, 1, '我觉得吧，这个人太假了，这么重要的会议，怎么会搞错机场？搞笑吧');
+	(1517365973, 2, 1, '我觉得吧，这个人太假了，这么重要的会议，怎么会搞错机场？搞笑吧'),
+	(1517467630, 2, 2, '烦死了'),
+	(1517467647, 2, 2, '酸奶打翻了，真的是一团糟'),
+	(1517467654, 2, 2, '卧槽'),
+	(1517467713, 2, 2, '世界是不是要毁灭了啊，收了吧'),
+	(1517467734, 2, 2, '烦死了'),
+	(1517467739, 2, 2, '烦死了'),
+	(1517467743, 2, 2, '烦死了');
 /*!40000 ALTER TABLE `text_messages` ENABLE KEYS */;
 
 -- Dumping structure for view wx_monitor.formated_recording_messages
