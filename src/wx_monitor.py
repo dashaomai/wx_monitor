@@ -19,33 +19,40 @@ def get_nickname(msg):
     return nickname
 
 
-def monitor(group_id, group_name):
-    groups = itchat.search_chatrooms(name=group_name)
-    if len(groups) > 0:
-        # 保存文字消息
-        @itchat.msg_register([TEXT], isGroupChat=True)
-        def print_messages(msg):
-            group_name2 = msg['User']['NickName']
-            if group_name2 == group_name:
-                # print('符合')
-                nickname = get_nickname(msg)
+# def monitor(group_id, group_name):
+def monitor(db_groups):
+    # 把聊天组的数组转化成字典
+    groups_dict = {}
 
-                member_count = msg['User']['MemberCount']
+    for group_id, group_name in db_groups:
+        groups_dict[group_name] = group_id
 
-                content = msg['Content']
-                create_time = msg['CreateTime']
-                insert_text_message(group_id, member_count, nickname, content, create_time)
+    # 保存文字消息
+    @itchat.msg_register([TEXT], isGroupChat=True)
+    def print_messages(msg):
+        group_name2 = msg['User']['NickName']
+        if group_name2 in groups_dict:
+            group_id2 = groups_dict[group_name2]
+            nickname = get_nickname(msg)
 
-                print('消息 ' + content + '已保存')
+            member_count = msg['User']['MemberCount']
 
-        # else:
-        # print('不符')
+            content = msg['Content']
+            create_time = msg['CreateTime']
+            insert_text_message(group_id2, member_count, nickname, content, create_time)
 
-        # 保存语音消息
-        @itchat.msg_register([RECORDING], isGroupChat=True)
-        def download_files(msg):
-            if not os.path.exists('records'):
-                os.makedirs('records')
+            print('消息 ' + content + '已保存')
+
+    # 保存语音消息
+    @itchat.msg_register([RECORDING], isGroupChat=True)
+    def download_files(msg):
+        if not os.path.exists('records'):
+            os.makedirs('records')
+
+        group_name2 = msg['User']['NickName']
+        if group_name2 in groups_dict:
+            group_id2 = groups_dict[group_name2]
+
             msg.download('records/' + msg.fileName)
 
             member_count = msg['User']['MemberCount']
@@ -53,12 +60,9 @@ def monitor(group_id, group_name):
             nickname = get_nickname(msg)
             filename = msg.fileName
             create_time = msg['CreateTime']
-            insert_recording_message(group_id, member_count, nickname, filename, create_time)
+            insert_recording_message(group_id2, member_count, nickname, filename, create_time)
 
             print('文件 ' + msg.fileName + ' 已下载')
-
-    else:
-        print('未能找到名为：' + group_name + '的聊天群')
 
 
 def main():
@@ -74,12 +78,8 @@ def main():
         # 以字符界面显示登录用二维码
         itchat.auto_login(enableCmdQR=cmd_qr)
 
-        # 监控每一个对应的聊天组
-        for group in db_groups:
-            group_id = group[0]
-            group_name = group[1]
-
-            monitor(group_id, group_name)
+        # 监控对应的聊天组
+        monitor(db_groups)
 
         itchat.run(True)
 
